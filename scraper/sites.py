@@ -49,11 +49,12 @@ def _get(session: requests.Session, url: str) -> Optional[BeautifulSoup]:
     return None
 
 
-def _resolve_url(href: str, base: str) -> str:
+def _resolve_url(href: object, base: str) -> str:
     """Resolve a potentially relative URL against a base."""
-    if not href:
+    h = str(href) if href else ""
+    if not h:
         return ""
-    return href if href.startswith("http") else base + href
+    return h if h.startswith("http") else base + h
 
 
 # ---------------------------------------------------------------------------
@@ -208,97 +209,65 @@ def scrape_seafarerjobs() -> list[Vacancy]:
 
 
 # ---------------------------------------------------------------------------
-# Jobs.ua Maritime  (Ukrainian)
+# UkrCrewingUA  (ukrcrewing.com.ua) — real maritime vacancies, clean HTML
+# Structure: <tr> → <td class='wrap'> rank | vessel | duration+salary+date
+#            <a class='var'> = vacancy link
 # ---------------------------------------------------------------------------
-def scrape_jobs_ua() -> list[Vacancy]:
-    base = BASE_URLS["Jobs.ua Maritime"]
-    url = base + "/ukr/vacancies-in-sphere-marine_vessels/"
-    log.info("Scraping Jobs.ua: %s", url)
+def scrape_ukrcrewing() -> list[Vacancy]:
+    base = "https://ukrcrewing.com.ua"
+    url = base + "/ua/vacancy/?on_page=50&v_sort=0&v_sort_dir=0"
+    log.info("Scraping UkrCrewingUA: %s", url)
     session = _session()
     soup = _get(session, url)
     if not soup:
-        log.warning("Jobs.ua: no response, returning empty")
+        log.warning("UkrCrewingUA: no response, returning empty")
         return []
 
     vacancies: list[Vacancy] = []
-    cards = soup.select(".card-vacancy, .vacancy__item, .b-vacancy-item")
-    log.info("Jobs.ua: found %d candidate cards", len(cards))
+    rows = soup.select("a.var")
+    log.info("UkrCrewingUA: found %d vacancy links", len(rows))
 
-    for card in cards:
+    for a in rows:
         try:
-            title = card.select_one(".card-vacancy-title, .vacancy__title, h2")
-            company = card.select_one(".card-company-name, .vacancy__company")
-            salary = card.select_one(".card-salary, .vacancy__salary")
-            region = card.select_one(".card-city, .vacancy__city")
-            link_tag = card.select_one("a[href]")
+            row = a.find_parent("tr")
+            if not row:
+                continue
+            cells = row.select("td.wrap")
+            if len(cells) < 3:
+                continue
 
-            href = str(link_tag["href"]) if link_tag and link_tag.get("href") else ""
+            rank        = cells[0].get_text(strip=True)  # e.g. "2nd Officer"
+            vessel_type = cells[1].get_text(strip=True)  # e.g. "Bulk Carrier"
+            details     = cells[2].get_text(" ", strip=True)  # "4 months 4000-5500 $ 11.04.26 17.02.26"
+
+            # Parse details cell: duration salary currency joining_date posted_date
+            parts = details.split()
+            duration     = f"{parts[0]} {parts[1]}" if len(parts) >= 2 and parts[1] in ("months","month","weeks","week") else parts[0] if parts else "—"
+            currency     = next((p for p in parts if p in ("$", "€", "USD", "EUR")), "")
+            salary_num   = next((p for p in parts if any(c.isdigit() for c in p) and p not in duration.split()), "")
+            salary       = f"{salary_num} {currency}".strip() if salary_num else "—"
+            joining_date = parts[-2] if len(parts) >= 2 else "—"
+
+            href = str(a.get("href", "") or "")
             vacancies.append(Vacancy(
-                title=title.get_text(strip=True) if title else "—",
-                company=company.get_text(strip=True) if company else "—",
-                rank=title.get_text(strip=True) if title else "—",
-                vessel_type=_extract_vessel_type(card.get_text()),
-                region=region.get_text(strip=True) if region else "Ukraine",
-                salary=salary.get_text(strip=True) if salary else "—",
-                duration="—",
-                joining_date="—",
-                source="jobs.ua",
+                title=rank,
+                company="UkrCrewingUA",
+                rank=rank,
+                vessel_type=vessel_type,
+                region="Worldwide",
+                salary=salary,
+                duration=duration,
+                joining_date=joining_date,
+                source="ukrcrewing.com.ua",
                 url=_resolve_url(href, base),
                 description="",
                 posted_at="",
                 is_urgent=False,
             ))
         except Exception as e:
-            log.warning("Jobs.ua: failed to parse card — %s", e)
+            log.warning("UkrCrewingUA: failed to parse row — %s", e)
 
-    log.info("Jobs.ua: parsed %d vacancies", len(vacancies))
-    return vacancies
-
-
-# ---------------------------------------------------------------------------
-# Work.ua Maritime  (Ukrainian)
-# ---------------------------------------------------------------------------
-def scrape_work_ua() -> list[Vacancy]:
-    base = BASE_URLS["Work.ua Maritime"]
-    url = base + "/jobs-sea/"
-    log.info("Scraping Work.ua: %s", url)
-    session = _session()
-    soup = _get(session, url)
-    if not soup:
-        log.warning("Work.ua: no response, returning empty")
-        return []
-
-    vacancies: list[Vacancy] = []
-    cards = soup.select(".job-link, .card.card-hover")
-    log.info("Work.ua: found %d candidate cards", len(cards))
-
-    for card in cards:
-        try:
-            title = card.select_one("h2, .h2")
-            company = card.select_one(".add-top-xs span")
-            salary = card.select_one(".h5.pull-right, .salary")
-            link_tag = card.select_one("a[href]")
-
-            href = str(link_tag["href"]) if link_tag and link_tag.get("href") else ""
-            vacancies.append(Vacancy(
-                title=title.get_text(strip=True) if title else "—",
-                company=company.get_text(strip=True) if company else "—",
-                rank=title.get_text(strip=True) if title else "—",
-                vessel_type=_extract_vessel_type(card.get_text()),
-                region="Ukraine",
-                salary=salary.get_text(strip=True) if salary else "—",
-                duration="—",
-                joining_date="—",
-                source="work.ua",
-                url=_resolve_url(href, base),
-                description="",
-                posted_at="",
-                is_urgent=False,
-            ))
-        except Exception as e:
-            log.warning("Work.ua: failed to parse card — %s", e)
-
-    log.info("Work.ua: parsed %d vacancies", len(vacancies))
+    log.info("UkrCrewingUA: parsed %d vacancies", len(vacancies))
     return vacancies
 
 
@@ -396,7 +365,6 @@ BS4_SCRAPERS: dict[str, object] = {
     "AllCrewing":          scrape_allcrewing,
     "Maritime Connector":  scrape_maritime_connector,
     "SeafarerJobs":        scrape_seafarerjobs,
-    "Jobs.ua Maritime":    scrape_jobs_ua,
-    "Work.ua Maritime":    scrape_work_ua,
+    "UkrCrewingUA":        scrape_ukrcrewing,     # verified working ✓
     "Crewtoo":             scrape_crewtoo,
 }

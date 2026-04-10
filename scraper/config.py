@@ -10,34 +10,36 @@ JOB_SITES = [
         "name": "AllCrewing",
         "url": "https://allcrewing.com/vacancies",
         "type": "bs4",
-        "enabled": True,
-        "notes": "Large international database. Inspect vacancy cards for selector updates.",
+        "enabled": False,
+        "notes": "404 as of 2026-04 — redirects to ukrcrewing.com.ua",
     },
     {
         "name": "Maritime Connector",
         "url": "https://maritime-connector.com/seafarer-jobs/",
         "type": "bs4",
-        "enabled": True,
-        "notes": "EU-focused, well-structured HTML.",
+        "enabled": False,
+        "notes": "DNS failure as of 2026-04 — domain possibly down",
     },
     {
         "name": "SeafarerJobs",
         "url": "https://www.seafarerjobs.com/jobs",
         "type": "bs4",
-        "enabled": True,
-        "notes": "Global listings, good rank metadata.",
+        "enabled": False,
+        "notes": "No parseable cards — likely JS-rendered or restructured",
     },
     {
         "name": "MarineJobs",
         "url": "https://www.marinejobs.net/vacancies",
         "type": "bs4",
-        "enabled": True,
+        "enabled": False,
+        "notes": "Not yet verified — enable and test",
     },
     {
         "name": "Crewtoo",
         "url": "https://www.crewtoo.com/maritime-jobs",
         "type": "bs4",
-        "enabled": True,
+        "enabled": False,
+        "notes": "Connection reset — bot protection active",
     },
     {
         "name": "Safety4Sea Jobs",
@@ -54,39 +56,18 @@ JOB_SITES = [
         "notes": "Large Norwegian crewing company.",
     },
     {
-        "name": "Barents Group",
-        "url": "https://www.barentsgroup.com/vacancies",
+        "name": "UkrCrewingUA",
+        "url": "https://ukrcrewing.com.ua/ua/vacancy/?on_page=50&v_sort=0&v_sort_dir=0",
         "type": "bs4",
         "enabled": True,
+        "notes": "Ukrainian maritime job site. Clean table HTML, verified working. ✓",
     },
-    {
-        "name": "Jobs.ua Maritime",
-        "url": "https://www.jobs.ua/ukr/vacancies-in-sphere-marine_vessels/",
-        "type": "bs4",
-        "enabled": True,
-        "notes": "Ukrainian job board, maritime category.",
-    },
-    {
-        "name": "Work.ua Maritime",
-        "url": "https://www.work.ua/jobs-sea/",
-        "type": "bs4",
-        "enabled": True,
-        "notes": "Ukrainian job board, sea/shipping category.",
-    },
-    {
-        "name": "Cadet Jobs",
-        "url": "https://www.cadetships.com/vacancies",
-        "type": "bs4",
-        "enabled": True,
-        "notes": "Cadet and entry-level positions.",
-    },
-    {
-        "name": "Offshore Center",
-        "url": "https://offshore-center.com/jobs",
-        "type": "bs4",
-        "enabled": True,
-        "notes": "Offshore-specific vacancies.",
-    },
+    # Disabled — dead/bot-blocked as of 2026-04:
+    # {"name": "Barents Group",    "url": "...", "enabled": False},
+    # {"name": "Jobs.ua Maritime", "url": "...", "enabled": False, "notes": "404"},
+    # {"name": "Work.ua Maritime", "url": "...", "enabled": False, "notes": "No maritime filter"},
+    # {"name": "Cadet Jobs",       "url": "...", "enabled": False},
+    # {"name": "Offshore Center",  "url": "...", "enabled": False},
 ]
 
 # ---------------------------------------------------------------------------
@@ -169,11 +150,7 @@ BASE_URLS: dict[str, str] = {
     "Crewtoo":            "https://www.crewtoo.com",
     "Safety4Sea Jobs":    "https://jobs.safety4sea.com",
     "Viking Crew":        "https://www.vikingcrewing.com",
-    "Barents Group":      "https://www.barentsgroup.com",
-    "Jobs.ua Maritime":   "https://www.jobs.ua",
-    "Work.ua Maritime":   "https://www.work.ua",
-    "Cadet Jobs":         "https://www.cadetships.com",
-    "Offshore Center":    "https://offshore-center.com",
+    "UkrCrewingUA":       "https://ukrcrewing.com.ua",   # verified working ✓
 }
 
 # ---------------------------------------------------------------------------
