@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ocean Clouds — Maritime Job Search for Seafarers</title>
-  <meta name="description" content="Find maritime vacancies across all ranks — job boards, company portals, and Telegram channels in one place." />
+  <title>Ocean Clouds — AI-Powered Maritime Job Search</title>
+  <meta name="description" content="Find maritime job vacancies across all ranks — AI reads job boards and Telegram channels so you don't have to." />
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -30,11 +30,12 @@
 <!-- ── HERO ── -->
 <header class="hero">
   <div class="hero-inner">
-    <div class="badge">For all seafarer ranks · Free &amp; open source</div>
+    <div class="badge">AI-powered · All ranks · Free &amp; open source</div>
     <h1>Find your next<br /><span class="accent">voyage</span></h1>
     <p class="hero-sub">
-      Vacancies from maritime job boards, crewing agencies, and Telegram
-      channels — aggregated in one place, for every rank.
+      Claude AI reads maritime job boards and Telegram channels, extracts
+      vacancies for every rank, and delivers clean results — no broken scrapers,
+      no missed posts.
     </p>
 
     <!-- Search form -->
@@ -152,12 +153,12 @@
 <section class="stats-bar">
   <div class="container stats-inner">
     <div class="stat">
-      <span class="stat-num" id="stat-sites">12</span>
-      <span class="stat-label">Job boards monitored</span>
+      <span class="stat-num">AI</span>
+      <span class="stat-label">Extracts vacancies</span>
     </div>
     <div class="stat-divider"></div>
     <div class="stat">
-      <span class="stat-num" id="stat-tg">8+</span>
+      <span class="stat-num">8+</span>
       <span class="stat-label">Telegram channels</span>
     </div>
     <div class="stat-divider"></div>
@@ -177,34 +178,31 @@
 <section class="sources-section" id="sources">
   <div class="container">
     <h2>Where we search</h2>
-    <p class="section-sub">Vacancies are pulled from these sources automatically.</p>
+    <p class="section-sub">AI reads pages and messages — add any source in one line of config.</p>
 
     <div class="sources-grid">
       <div class="source-card source-card--web">
         <div class="source-icon">🌐</div>
         <h3>Job Boards</h3>
         <ul>
-          <li>allcrewing.com</li>
-          <li>maritime-connector.com</li>
-          <li>seafarerjobs.com</li>
+          <li>ukrcrewing.com.ua</li>
           <li>marinejobs.net</li>
-          <li>crewtoo.com</li>
-          <li>safety4sea.com/jobs</li>
-          <li>vikingcrewing.com</li>
-          <li>barentsgroup.com</li>
-          <li>offshore-center.com</li>
+          <li>seafarerjobs.com</li>
+          <li>+ add any URL</li>
         </ul>
+        <p class="source-note">Claude reads the page text and extracts vacancies — no CSS selectors, no maintenance.</p>
       </div>
 
       <div class="source-card source-card--ua">
-        <div class="source-icon">🇺🇦</div>
-        <h3>Ukrainian Portals</h3>
+        <div class="source-icon">🤖</div>
+        <h3>AI Extraction</h3>
         <ul>
-          <li>jobs.ua (maritime)</li>
-          <li>work.ua (sea)</li>
-          <li>stsc.com.ua</li>
+          <li>Any site structure</li>
+          <li>Any language</li>
+          <li>Rank normalization</li>
+          <li>Salary parsing</li>
         </ul>
-        <p class="source-note">Ukrainian-language job boards with maritime sections.</p>
+        <p class="source-note">Claude Haiku extracts rank, vessel, salary, duration from raw page text.</p>
       </div>
 
       <div class="source-card source-card--tg">
@@ -218,7 +216,7 @@
           <li>@moryaki_ua</li>
           <li>@ships_crew_jobs</li>
           <li>@offshore_crew_network</li>
-          <li>+ configure your own</li>
+          <li>+ any private group</li>
         </ul>
       </div>
     </div>
@@ -240,29 +238,29 @@
           <h4>Clone &amp; install</h4>
           <pre><code>git clone https://github.com/petro-nazarenko/ocean-clouds
 cd ocean-clouds
-pip install -r requirements.txt
-playwright install chromium</code></pre>
+pip install -r requirements.txt</code></pre>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <h4>Configure Telegram (optional)</h4>
+          <h4>Add API keys</h4>
           <pre><code>cp .env.example .env
-# Add TG_API_ID and TG_API_HASH
-python -m scraper.telegram --setup</code></pre>
+# ANTHROPIC_API_KEY — console.anthropic.com
+# TG_API_ID + TG_API_HASH — my.telegram.org/apps (optional)
+python -m scraper.telegram --setup  # Telegram auth, one-time</code></pre>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          <h4>Use in Claude Code</h4>
-          <pre><code>/ocean-clouds:search Chief Officer Tanker
-/ocean-clouds:tg --since 48
-/ocean-clouds:filter --salary 7000 --urgent
-/ocean-clouds:sources</code></pre>
+          <h4>Search in Claude Code</h4>
+          <pre><code>/search Chief Officer Tanker
+/tg --since 48
+/filter --salary 7000 --urgent
+/sources</code></pre>
         </div>
       </div>
     </div>
