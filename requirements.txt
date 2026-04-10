@@ -1,13 +1,12 @@
-# Core scraping
+# Fetching
 requests>=2.31.0
-beautifulsoup4>=4.12.0
-lxml>=5.0.0             # faster BS4 parser
+beautifulsoup4>=4.12.0   # text extraction only (no selector parsing)
 
-# JavaScript-rendered sites
-playwright>=1.43.0      # run: playwright install chromium
+# LLM extraction
+anthropic>=0.40.0
 
 # Telegram
-telethon>=1.34.0        # MTProto Telegram client
+telethon>=1.34.0
 
-# Environment & utils
+# Utils
 python-dotenv>=1.0.0
