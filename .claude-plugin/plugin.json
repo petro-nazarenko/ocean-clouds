@@ -1,0 +1,27 @@
+{
+  "name": "ocean-clouds",
+  "version": "1.0.0",
+  "description": "Find maritime job vacancies for all seafarer ranks — scrapes job boards, company portals, and Telegram channels. Built for the ocean-clouds project.",
+  "skills": [
+    {
+      "name": "search",
+      "description": "Search all maritime job sources (boards + Telegram). Args: [rank] [vessel_type] [region]",
+      "prompt": "skills/search.md"
+    },
+    {
+      "name": "tg",
+      "description": "Fetch latest job posts from configured Telegram maritime groups and channels",
+      "prompt": "skills/tg-fetch.md"
+    },
+    {
+      "name": "filter",
+      "description": "Filter job results by rank, vessel type, or region. Args: --rank --vessel --region --salary",
+      "prompt": "skills/filter.md"
+    },
+    {
+      "name": "sources",
+      "description": "List and manage all configured job sources (sites and Telegram channels)",
+      "prompt": "skills/sources.md"
+    }
+  ]
+}

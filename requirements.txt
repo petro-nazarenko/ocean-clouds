@@ -1,0 +1,13 @@
+# Core scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0             # faster BS4 parser
+
+# JavaScript-rendered sites
+playwright>=1.43.0      # run: playwright install chromium
+
+# Telegram
+telethon>=1.34.0        # MTProto Telegram client
+
+# Environment & utils
+python-dotenv>=1.0.0

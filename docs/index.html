@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ocean Clouds — Maritime Job Search for Seafarers</title>
+  <meta name="description" content="Find maritime vacancies across all ranks — job boards, company portals, and Telegram channels in one place." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo">
+      <span class="logo-icon">⚓</span>
+      <span class="logo-text">Ocean Clouds</span>
+    </div>
+    <div class="nav-links">
+      <a href="#search">Search</a>
+      <a href="#sources">Sources</a>
+      <a href="#plugin">Plugin</a>
+      <a href="https://github.com/petro-nazarenko/ocean-clouds" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="badge">For all seafarer ranks · Free &amp; open source</div>
+    <h1>Find your next<br /><span class="accent">voyage</span></h1>
+    <p class="hero-sub">
+      Vacancies from maritime job boards, crewing agencies, and Telegram
+      channels — aggregated in one place, for every rank.
+    </p>
+
+    <!-- Search form -->
+    <form class="search-form" id="search" action="#results" method="GET" onsubmit="handleSearch(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rank">Rank / Position</label>
+          <select id="rank" name="rank">
+            <option value="">All ranks</option>
+            <optgroup label="Deck Officers">
+              <option>Master / Captain</option>
+              <option>Chief Officer</option>
+              <option>Second Officer</option>
+              <option>Third Officer</option>
+              <option>Deck Cadet</option>
+            </optgroup>
+            <optgroup label="Engine Officers">
+              <option>Chief Engineer</option>
+              <option>Second Engineer</option>
+              <option>Third Engineer</option>
+              <option>Fourth Engineer</option>
+              <option>ETO / Electrician</option>
+              <option>Engine Cadet</option>
+            </optgroup>
+            <optgroup label="Ratings">
+              <option>Bosun</option>
+              <option>AB</option>
+              <option>OS</option>
+              <option>Fitter</option>
+              <option>Oiler</option>
+              <option>Wiper</option>
+              <option>Cook</option>
+              <option>Steward</option>
+            </optgroup>
+            <optgroup label="Offshore">
+              <option>OIM</option>
+              <option>Barge Master</option>
+              <option>DP Operator</option>
+              <option>Crane Operator</option>
+              <option>ROV Pilot</option>
+              <option>Diver</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="vessel">Vessel Type</label>
+          <select id="vessel" name="vessel">
+            <option value="">All vessels</option>
+            <option>Container</option>
+            <option>Bulk Carrier</option>
+            <option>Tanker</option>
+            <option>Chemical Tanker</option>
+            <option>LNG</option>
+            <option>LPG</option>
+            <option>VLCC</option>
+            <option>PSV</option>
+            <option>AHTS</option>
+            <option>Offshore</option>
+            <option>Drillship</option>
+            <option>Cruise</option>
+            <option>Ferry</option>
+            <option>Ro-Ro</option>
+            <option>General Cargo</option>
+            <option>Tug</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="region">Region</label>
+          <select id="region" name="region">
+            <option value="">Worldwide</option>
+            <option>North Sea</option>
+            <option>Mediterranean</option>
+            <option>Baltic</option>
+            <option>Black Sea</option>
+            <option>Atlantic</option>
+            <option>Pacific</option>
+            <option>Far East</option>
+            <option>Southeast Asia</option>
+            <option>Middle East</option>
+            <option>Indian Ocean</option>
+            <option>Gulf of Mexico</option>
+            <option>West Africa</option>
+            <option>Arctic</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row form-row--email">
+        <div class="form-group form-group--email">
+          <label for="email">Email for job alerts <span class="optional">(optional)</span></label>
+          <input type="email" id="email" name="email" placeholder="your@email.com" />
+        </div>
+        <button type="submit" class="btn-search">
+          <span class="btn-icon">🔍</span> Search Vacancies
+        </button>
+      </div>
+    </form>
+  </div>
+</header>
+
+<!-- ── RESULTS (populated by JS) ── -->
+<section id="results" class="results hidden">
+  <div class="container">
+    <div class="results-header">
+      <h2>Results <span id="results-count" class="count-badge"></span></h2>
+      <div class="results-meta" id="results-meta"></div>
+    </div>
+    <div id="results-list" class="results-list"></div>
+  </div>
+</section>
+
+<!-- ── STATS BAR ── -->
+<section class="stats-bar">
+  <div class="container stats-inner">
+    <div class="stat">
+      <span class="stat-num" id="stat-sites">12</span>
+      <span class="stat-label">Job boards monitored</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num" id="stat-tg">8+</span>
+      <span class="stat-label">Telegram channels</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">All</span>
+      <span class="stat-label">Seafarer ranks</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">Free</span>
+      <span class="stat-label">Open source</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOURCES ── -->
+<section class="sources-section" id="sources">
+  <div class="container">
+    <h2>Where we search</h2>
+    <p class="section-sub">Vacancies are pulled from these sources automatically.</p>
+
+    <div class="sources-grid">
+      <div class="source-card source-card--web">
+        <div class="source-icon">🌐</div>
+        <h3>Job Boards</h3>
+        <ul>
+          <li>allcrewing.com</li>
+          <li>maritime-connector.com</li>
+          <li>seafarerjobs.com</li>
+          <li>marinejobs.net</li>
+          <li>crewtoo.com</li>
+          <li>safety4sea.com/jobs</li>
+          <li>vikingcrewing.com</li>
+          <li>barentsgroup.com</li>
+          <li>offshore-center.com</li>
+        </ul>
+      </div>
+
+      <div class="source-card source-card--ua">
+        <div class="source-icon">🇺🇦</div>
+        <h3>Ukrainian Portals</h3>
+        <ul>
+          <li>jobs.ua (maritime)</li>
+          <li>work.ua (sea)</li>
+          <li>stsc.com.ua</li>
+        </ul>
+        <p class="source-note">Ukrainian-language job boards with maritime sections.</p>
+      </div>
+
+      <div class="source-card source-card--tg">
+        <div class="source-icon">✈️</div>
+        <h3>Telegram Channels</h3>
+        <ul>
+          <li>@seafarer_jobs</li>
+          <li>@marine_vacancies</li>
+          <li>@offshore_vacancies</li>
+          <li>@maritime_jobs_ukraine</li>
+          <li>@moryaki_ua</li>
+          <li>@ships_crew_jobs</li>
+          <li>@offshore_crew_network</li>
+          <li>+ configure your own</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PLUGIN ── -->
+<section class="plugin-section" id="plugin">
+  <div class="container">
+    <h2>Power users: Claude Code plugin</h2>
+    <p class="section-sub">
+      Install the <strong>ocean-clouds</strong> plugin for Claude Code and search directly from your terminal.
+    </p>
+
+    <div class="plugin-steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Clone &amp; install</h4>
+          <pre><code>git clone https://github.com/petro-nazarenko/ocean-clouds
+cd ocean-clouds
+pip install -r requirements.txt
+playwright install chromium</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Configure Telegram (optional)</h4>
+          <pre><code>cp .env.example .env
+# Add TG_API_ID and TG_API_HASH
+python -m scraper.telegram --setup</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Use in Claude Code</h4>
+          <pre><code>/ocean-clouds:search Chief Officer Tanker
+/ocean-clouds:tg --since 48
+/ocean-clouds:filter --salary 7000 --urgent
+/ocean-clouds:sources</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ALERT SIGNUP ── -->
+<section class="alert-section">
+  <div class="container">
+    <div class="alert-card">
+      <h2>Get job alerts by email</h2>
+      <p>Submit your rank and we'll notify you when matching vacancies appear.</p>
+      <form
+        class="alert-form"
+        action="https://formspree.io/f/YOUR_FORM_ID"
+        method="POST"
+        onsubmit="handleAlertSubmit(event)"
+      >
+        <input type="hidden" name="_subject" value="Ocean Clouds — Job Alert Signup" />
+        <div class="alert-row">
+          <select name="rank" required>
+            <option value="" disabled selected>Select your rank</option>
+            <option>Master / Captain</option>
+            <option>Chief Officer</option>
+            <option>Second Officer</option>
+            <option>Third Officer</option>
+            <option>Chief Engineer</option>
+            <option>Second Engineer</option>
+            <option>Third Engineer</option>
+            <option>ETO / Electrician</option>
+            <option>AB</option>
+            <option>OS</option>
+            <option>Bosun</option>
+            <option>Cook</option>
+            <option>Offshore / Other</option>
+          </select>
+          <input type="email" name="email" placeholder="your@email.com" required />
+          <button type="submit" class="btn-alert">Subscribe</button>
+        </div>
+        <p class="form-note">No spam. Unsubscribe any time.</p>
+      </form>
+      <div class="alert-success hidden" id="alert-success">
+        ✓ Subscribed! We'll notify you of matching vacancies.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="logo-icon">⚓</span>
+      <span>Ocean Clouds</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/petro-nazarenko/ocean-clouds" target="_blank">GitHub</a>
+      <a href="https://github.com/petro-nazarenko/ocean-clouds/issues" target="_blank">Report issue</a>
+      <a href="https://github.com/petro-nazarenko/ocean-clouds#readme" target="_blank">Docs</a>
+    </div>
+    <div class="footer-note">Open source · MIT · Built for seafarers</div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
