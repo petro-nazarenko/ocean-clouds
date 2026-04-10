@@ -159,6 +159,24 @@ CACHE_TTL_HOURS = 2          # How long to use cached results before re-fetching
 TG_CACHE_TTL_HOURS = 1       # Telegram cache TTL
 
 # ---------------------------------------------------------------------------
+# Base URLs for relative-link resolution (used by scrapers)
+# ---------------------------------------------------------------------------
+BASE_URLS: dict[str, str] = {
+    "AllCrewing":         "https://allcrewing.com",
+    "Maritime Connector": "https://maritime-connector.com",
+    "SeafarerJobs":       "https://www.seafarerjobs.com",
+    "MarineJobs":         "https://www.marinejobs.net",
+    "Crewtoo":            "https://www.crewtoo.com",
+    "Safety4Sea Jobs":    "https://jobs.safety4sea.com",
+    "Viking Crew":        "https://www.vikingcrewing.com",
+    "Barents Group":      "https://www.barentsgroup.com",
+    "Jobs.ua Maritime":   "https://www.jobs.ua",
+    "Work.ua Maritime":   "https://www.work.ua",
+    "Cadet Jobs":         "https://www.cadetships.com",
+    "Offshore Center":    "https://offshore-center.com",
+}
+
+# ---------------------------------------------------------------------------
 # Scraper behaviour
 # ---------------------------------------------------------------------------
 REQUEST_TIMEOUT = 15         # seconds

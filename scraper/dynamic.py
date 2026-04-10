@@ -6,9 +6,9 @@ Install: pip install playwright && playwright install chromium
 Each scraper returns list[Vacancy]. Selectors may need updates if sites redesign.
 """
 import logging
-from typing import Optional
 
 from .models import Vacancy
+from .config import BASE_URLS
 from .sites import _extract_vessel_type, _extract_region, _extract_salary, _extract_duration
 
 log = logging.getLogger(__name__)
@@ -30,15 +30,21 @@ def scrape_safety4sea() -> list[Vacancy]:
 
     from playwright.sync_api import sync_playwright
 
-    vacancies = []
+    base = BASE_URLS["Safety4Sea Jobs"]
+    url = next(s["url"] for s in __import__("scraper.config", fromlist=["JOB_SITES"]).JOB_SITES if s["name"] == "Safety4Sea Jobs")
+    log.info("Scraping Safety4Sea (Playwright): %s", url)
+
+    vacancies: list[Vacancy] = []
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
         try:
-            page.goto("https://jobs.safety4sea.com/search-jobs/", timeout=30000)
+            page.goto(url, timeout=30000)
             page.wait_for_selector(".job-listing, .search-result, article", timeout=15000)
 
             cards = page.query_selector_all(".job-listing, .search-result, article.job")
+            log.info("Safety4Sea: found %d candidate cards", len(cards))
+
             for card in cards:
                 try:
                     title_el = card.query_selector("h2, h3, .job-title")
@@ -48,9 +54,8 @@ def scrape_safety4sea() -> list[Vacancy]:
 
                     title = title_el.inner_text().strip() if title_el else "—"
                     company = company_el.inner_text().strip() if company_el else "—"
-                    url = link_el.get_attribute("href") if link_el else ""
-                    if url and not url.startswith("http"):
-                        url = "https://jobs.safety4sea.com" + url
+                    href = link_el.get_attribute("href") if link_el else ""
+                    resolved_url = href if href and href.startswith("http") else base + (href or "")
 
                     vacancies.append(Vacancy(
                         title=title,
@@ -62,46 +67,53 @@ def scrape_safety4sea() -> list[Vacancy]:
                         duration=_extract_duration(text),
                         joining_date="—",
                         source="safety4sea.com",
-                        url=url,
+                        url=resolved_url,
                         description=text[:200],
                         posted_at="",
                         is_urgent="urgent" in text.lower(),
                     ))
                 except Exception as e:
-                    log.debug("Safety4Sea card error: %s", e)
+                    log.warning("Safety4Sea: failed to parse card — %s", e)
+
         except Exception as e:
-            log.warning("Safety4Sea scrape failed: %s", e)
+            log.error("Safety4Sea scrape failed entirely: %s", e)
         finally:
             browser.close()
+
+    log.info("Safety4Sea: parsed %d vacancies", len(vacancies))
     return vacancies
 
 
 def scrape_viking_crew() -> list[Vacancy]:
     """Viking Crew vacancies — JS-rendered."""
     if not _playwright_available():
-        log.warning("Playwright not installed.")
+        log.warning("Playwright not installed. Run: pip install playwright && playwright install chromium")
         return []
 
     from playwright.sync_api import sync_playwright
 
-    vacancies = []
+    base = BASE_URLS["Viking Crew"]
+    url = next(s["url"] for s in __import__("scraper.config", fromlist=["JOB_SITES"]).JOB_SITES if s["name"] == "Viking Crew")
+    log.info("Scraping Viking Crew (Playwright): %s", url)
+
+    vacancies: list[Vacancy] = []
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
         try:
-            page.goto("https://www.vikingcrewing.com/crew/vacancies", timeout=30000)
-            # Wait for vacancy list to load
+            page.goto(url, timeout=30000)
             page.wait_for_selector(".vacancy, .job-item, table tr", timeout=15000)
 
             cards = page.query_selector_all(".vacancy-item, .job-row, table tbody tr")
+            log.info("Viking Crew: found %d candidate rows", len(cards))
+
             for card in cards:
                 try:
                     cells = card.query_selector_all("td")
                     text = card.inner_text()
                     link_el = card.query_selector("a")
-                    url = link_el.get_attribute("href") if link_el else ""
-                    if url and not url.startswith("http"):
-                        url = "https://www.vikingcrewing.com" + url
+                    href = link_el.get_attribute("href") if link_el else ""
+                    resolved_url = href if href and href.startswith("http") else base + (href or "")
 
                     # Viking typically shows: Rank | Vessel | Salary | Date
                     rank = cells[0].inner_text().strip() if len(cells) > 0 else _extract_rank_from_text(text)
@@ -118,17 +130,20 @@ def scrape_viking_crew() -> list[Vacancy]:
                         duration=_extract_duration(text),
                         joining_date="—",
                         source="vikingcrewing.com",
-                        url=url,
+                        url=resolved_url,
                         description=text[:200],
                         posted_at="",
                         is_urgent="urgent" in text.lower(),
                     ))
                 except Exception as e:
-                    log.debug("Viking Crew row error: %s", e)
+                    log.warning("Viking Crew: failed to parse row — %s", e)
+
         except Exception as e:
-            log.warning("Viking Crew scrape failed: %s", e)
+            log.error("Viking Crew scrape failed entirely: %s", e)
         finally:
             browser.close()
+
+    log.info("Viking Crew: parsed %d vacancies", len(vacancies))
     return vacancies
 
 
@@ -144,7 +159,7 @@ def _extract_rank_from_text(text: str) -> str:
 # ---------------------------------------------------------------------------
 # Registry: all Playwright scrapers
 # ---------------------------------------------------------------------------
-PLAYWRIGHT_SCRAPERS = {
+PLAYWRIGHT_SCRAPERS: dict[str, object] = {
     "Safety4Sea Jobs": scrape_safety4sea,
     "Viking Crew":     scrape_viking_crew,
 }

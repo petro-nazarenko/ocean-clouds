@@ -1,6 +1,6 @@
 """Shared data models for vacancy results."""
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
+from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
 from typing import Optional
 import json
 
@@ -63,7 +63,7 @@ def save_cache(vacancies: list[Vacancy], path: str) -> None:
     import os
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     data = {
-        "fetched_at": datetime.utcnow().isoformat(),
+        "fetched_at": datetime.now(timezone.utc).isoformat(),
         "count": len(vacancies),
         "vacancies": [v.to_dict() for v in vacancies],
     }
